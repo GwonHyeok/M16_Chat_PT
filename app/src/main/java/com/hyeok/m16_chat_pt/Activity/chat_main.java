@@ -1,5 +1,6 @@
 package com.hyeok.m16_chat_pt.Activity;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -80,7 +81,18 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
     public void onClick(View v) {
         if(v.getId() == CHAT_BUTTON.getId()) {
             if(!CHAT_EDITTEXT.getText().toString().isEmpty()) {
-                chatOutputStream.sendMessage(CHAT_EDITTEXT.getText().toString());
+                // 스피너조건 확인 모두에게 클랜에게 친구에게...
+                switch (CHAT_SPINNER.getSelectedItemPosition()) {
+                    case 0: // 모두에게...
+                        chatOutputStream.sendMessage(CHAT_EDITTEXT.getText().toString());
+                        break;
+                    case 1: // 친구에게...
+                        chatOutputStream.sendMessage("/f msg "+CHAT_EDITTEXT.getText().toString());
+                        break;
+                    case 2: // 클랜에게...
+                        chatOutputStream.sendMessage("/c msg "+CHAT_EDITTEXT.getText().toString());
+                        break;
+                }
                 CHAT_EDITTEXT.setText("");
             } else {
                 Toast.makeText(this, "메세지를 입력하세요.", Toast.LENGTH_SHORT).show();
@@ -88,6 +100,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
         }
     }
 
+    @SuppressLint("NewApi")
     private void NotificationInit() {
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) {
