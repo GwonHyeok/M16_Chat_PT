@@ -1,4 +1,4 @@
-package com.hyeok.m16.chat_pt.Utils;
+package com.hyeok.m16_chat_pt.Utils;
 
 import android.content.Context;
 import android.content.res.AssetManager;

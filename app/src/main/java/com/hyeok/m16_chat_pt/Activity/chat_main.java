@@ -14,7 +14,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.hyeok.m16.chat_pt.Utils.BinaryUtil;
+import com.hyeok.m16_chat_pt.Utils.BinaryUtil;
 import com.hyeok.m16_chat_pt.app.R;
 
 import java.io.BufferedReader;
