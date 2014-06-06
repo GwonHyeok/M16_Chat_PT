@@ -1,16 +1,25 @@
 package com.hyeok.m16_chat_pt.Activity;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +39,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
     private Button CHAT_BUTTON;
     private EditText CHAT_EDITTEXT;
     private ScrollView CHAT_SCROLL;
+    private Spinner CHAT_SPINNER;
     private Handler CHAT_TV_HANDLER;
     private final String ID = "m16";
     private final String PW = "aa";
@@ -43,6 +53,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
         ViewInit();
         ChatInit();
         HandlerInit();
+        NotificationInit();
     }
 
 
@@ -74,6 +85,31 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
             } else {
                 Toast.makeText(this, "메세지를 입력하세요.", Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    private void NotificationInit() {
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) {
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, chat_main.class), PendingIntent.FLAG_NO_CREATE);
+            Notification.Builder mBuilder = new Notification.Builder(this);
+            mBuilder.setSmallIcon(R.drawable.ic_launcher);
+            mBuilder.setWhen(System.currentTimeMillis());
+            mBuilder.setNumber(0);
+            mBuilder.setContentTitle("M16채팅이 실행중 입니다...");
+            mBuilder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE);
+            mBuilder.setContentIntent(pendingIntent);
+            mBuilder.setOngoing(true);
+            mBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
+            nm.notify(0, mBuilder.build());
+        } else {
+            Notification notification = new Notification(R.drawable.ic_launcher, "M16채팅이 실행중 입니다...", System.currentTimeMillis());
+            notification.flags = Notification.FLAG_AUTO_CANCEL;
+            notification.defaults = Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE ;
+            notification.number = 0;
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, chat_main.class), PendingIntent.FLAG_NO_CREATE);
+            notification.setLatestEventInfo(this, "M16채팅이 실행중 입니다...", "", pendingIntent);
+            nm.notify(0, notification);
         }
     }
 
@@ -200,6 +236,8 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
         CHAT_EDITTEXT = (EditText)findViewById(R.id.CHAT_EDITTEXT);
         CHAT_BUTTON.setOnClickListener(this);
         CHAT_SCROLL = (ScrollView)findViewById(R.id.CHAT_SCROLL);
+        CHAT_SPINNER = (Spinner)findViewById(R.id.CHAT_SPINNER);
+        CHAT_SPINNER.setAdapter(new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.CHAT_SPINNER_ITEM)));
     }
 
     private void HandlerInit() {
