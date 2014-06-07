@@ -78,6 +78,13 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(0);
+    }
+
+    @Override
     public void onClick(View v) {
         if(v.getId() == CHAT_BUTTON.getId()) {
             if(!CHAT_EDITTEXT.getText().toString().isEmpty()) {
@@ -104,7 +111,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
     private void NotificationInit() {
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) {
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, chat_main.class), PendingIntent.FLAG_NO_CREATE);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, chat_main.class), PendingIntent.FLAG_UPDATE_CURRENT);
             Notification.Builder mBuilder = new Notification.Builder(this);
             mBuilder.setSmallIcon(R.drawable.ic_launcher);
             mBuilder.setWhen(System.currentTimeMillis());
@@ -120,7 +127,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
             notification.flags = Notification.FLAG_AUTO_CANCEL;
             notification.defaults = Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE ;
             notification.number = 0;
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, chat_main.class), PendingIntent.FLAG_NO_CREATE);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, chat_main.class), PendingIntent.FLAG_UPDATE_CURRENT);
             notification.setLatestEventInfo(this, "M16채팅이 실행중 입니다...", "", pendingIntent);
             nm.notify(0, notification);
         }
