@@ -104,6 +104,8 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
             } else {
                 Toast.makeText(this, "메세지를 입력하세요.", Toast.LENGTH_SHORT).show();
             }
+        } else if(v.getId() == CHAT_EDITTEXT.getId()) {
+                ScrollDown();
         }
     }
 
@@ -146,7 +148,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
             String FILE_DIR = BinaryUtil.getInstance().GetBinaryPath(this);
             Log.i(TAG, "ChatInit()");
             Log.i(TAG, FILE_DIR);
-            Process process = Runtime.getRuntime().exec(FILE_DIR+" -a --client=W3XP  m16.ggu.la");
+            Process process = Runtime.getRuntime().exec(FILE_DIR+" -a --client=W3XP  m16-chat.ggu.la");
             // 입력 스트림
             OutputStream outputStream = process.getOutputStream();
             chatOutputStream = new ChatOutputStream(outputStream);
@@ -219,7 +221,6 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
                         str_msg.obj = ((String)str_msg.obj).replace("<Info>", "");
                         str_msg.obj = ((String)str_msg.obj).replace("<Error>", "");
                         str_msg.obj = ((String)str_msg.obj).replace("[33m ", "");
-                        Log.d(TAG, str_msg.obj.toString());
                         CHAT_TV_HANDLER.sendMessage(str_msg);
                     }
                 }
@@ -255,6 +256,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
         CHAT_BUTTON = (Button)findViewById(R.id.CHAT_BUTTON);
         CHAT_EDITTEXT = (EditText)findViewById(R.id.CHAT_EDITTEXT);
         CHAT_BUTTON.setOnClickListener(this);
+        CHAT_EDITTEXT.setOnClickListener(this);
         CHAT_SCROLL = (ScrollView)findViewById(R.id.CHAT_SCROLL);
         CHAT_SPINNER = (Spinner)findViewById(R.id.CHAT_SPINNER);
         CHAT_SPINNER.setAdapter(new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.CHAT_SPINNER_ITEM)));
