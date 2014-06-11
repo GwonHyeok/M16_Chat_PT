@@ -181,6 +181,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
                 Enter();
                 return true;
             } catch (IOException e) {
+                Toast.makeText(chat_main.this, "연결이 끊겼습니다.", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
                 return false;
             }
@@ -220,7 +221,6 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
                         str_msg.obj = ((String)str_msg.obj).replace("[0m]     ", "");
                         str_msg.obj = ((String)str_msg.obj).replace("<Info>", "");
                         str_msg.obj = ((String)str_msg.obj).replace("<Error>", "");
-                        str_msg.obj = ((String)str_msg.obj).replace("[33m ", "");
                         CHAT_TV_HANDLER.sendMessage(str_msg);
                     }
                 }
