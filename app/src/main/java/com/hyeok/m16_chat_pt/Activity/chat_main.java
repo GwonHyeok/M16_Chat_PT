@@ -21,9 +21,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.hyeok.m16_chat_pt.CustomView.AnsiTextView;
 import com.hyeok.m16_chat_pt.Utils.BinaryUtil;
 import com.hyeok.m16_chat_pt.app.R;
 
@@ -36,7 +36,7 @@ import java.io.OutputStream;
 
 public class chat_main extends ActionBarActivity implements View.OnClickListener{
     private String TAG = "M16_CHAT";
-    private TextView CHAT_TEXTVIEW;
+    private AnsiTextView CHAT_TEXTVIEW;
     private Button CHAT_BUTTON;
     private EditText CHAT_EDITTEXT;
     private ScrollView CHAT_SCROLL;
@@ -252,7 +252,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
     }
 
     private void ViewInit() {
-        CHAT_TEXTVIEW = (TextView)findViewById(R.id.CHAT_VIEW);
+        CHAT_TEXTVIEW = (AnsiTextView)findViewById(R.id.CHAT_VIEW);
         CHAT_BUTTON = (Button)findViewById(R.id.CHAT_BUTTON);
         CHAT_EDITTEXT = (EditText)findViewById(R.id.CHAT_EDITTEXT);
         CHAT_BUTTON.setOnClickListener(this);
