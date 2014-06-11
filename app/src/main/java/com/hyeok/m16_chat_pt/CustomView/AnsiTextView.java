@@ -8,6 +8,9 @@ import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Created by GwonHyeok on 2014. 6. 11..
  */
@@ -38,12 +41,60 @@ public class AnsiTextView extends TextView {
 
     @Override
     public void append(CharSequence charSequence, int start, int end) {
-        SpannableStringBuilder sb = new SpannableStringBuilder(charSequence);
-        if(charSequence.toString().contains("[31m")) {
-            sb.setSpan(new ForegroundColorSpan(RED), 0, charSequence.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        } else if(charSequence.toString().contains("[32m")) {
-            sb.setSpan(new ForegroundColorSpan(GREEN), 0, charSequence.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        int INDEX = 1, length = 0;
+        Pattern pattern = Pattern.compile("\\[[0-9]*m");
+        String result[] = pattern.split(charSequence);
+        Matcher matcher = pattern.matcher(charSequence);
+        SpannableStringBuilder spannableStringBuilder;
+        if(!matcher.find()) {
+            spannableStringBuilder = new SpannableStringBuilder(charSequence);
+        } else {
+            if (result.length == 1) return;
+            spannableStringBuilder = new SpannableStringBuilder();
         }
-        super.append(sb, start, end);
+        matcher.reset();
+        while(matcher.find()) {
+            String ANSI_CODE = matcher.group();
+            if(ANSI_CODE.equals("[0m")) {
+                if(INDEX > 1) length = spannableStringBuilder.length();
+                spannableStringBuilder.append(result[INDEX]);
+                try {
+                    spannableStringBuilder.setSpan(new ForegroundColorSpan(BLACK), INDEX > 1 ? length : 0, spannableStringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                } catch (IndexOutOfBoundsException e) {
+                    spannableStringBuilder.setSpan(new ForegroundColorSpan(BLACK), 0, spannableStringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+            } else if(ANSI_CODE.equals("[31m")) {
+                if(INDEX > 1) length = spannableStringBuilder.length();
+                spannableStringBuilder.append(result[INDEX]);
+                spannableStringBuilder.setSpan(new ForegroundColorSpan(RED), INDEX > 1 ? length : 0, spannableStringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            } else if(ANSI_CODE.equals("[32m")) {
+                if(INDEX > 1) length = spannableStringBuilder.length();
+                spannableStringBuilder.append(result[INDEX]);
+                spannableStringBuilder.setSpan(new ForegroundColorSpan(GREEN), INDEX > 1 ? length : 0, spannableStringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            } else if(ANSI_CODE.equals("[33m")) {
+                if(INDEX > 1) length = spannableStringBuilder.length();
+                spannableStringBuilder.append(result[INDEX]);
+                spannableStringBuilder.setSpan(new ForegroundColorSpan(BROWN), INDEX > 1 ? length : 0, spannableStringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            } else if(ANSI_CODE.equals("[34m")) {
+                if(INDEX > 1) length = spannableStringBuilder.length();
+                spannableStringBuilder.append(result[INDEX]);
+                spannableStringBuilder.setSpan(new ForegroundColorSpan(BLUE), INDEX > 1 ? length : 0, spannableStringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            } else if(ANSI_CODE.equals("[35m")) {
+                if(INDEX > 1) length = spannableStringBuilder.length();
+                spannableStringBuilder.append(result[INDEX]);
+                spannableStringBuilder.setSpan(new ForegroundColorSpan(MAGENTA), INDEX > 1 ? length : 0, spannableStringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            } else if(ANSI_CODE.equals("[36m")) {
+                if(INDEX > 1) length = spannableStringBuilder.length();
+                spannableStringBuilder.append(result[INDEX]);
+                spannableStringBuilder.setSpan(new ForegroundColorSpan(CYAN), INDEX > 1 ? length : 0, spannableStringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            } else if(ANSI_CODE.equals("[37m")) {
+                if(INDEX > 1) length = spannableStringBuilder.length();
+                spannableStringBuilder.append(result[INDEX]);
+                spannableStringBuilder.setSpan(new ForegroundColorSpan(GRAY), INDEX > 1 ? length : 0, spannableStringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            length = 0;
+            INDEX++;
+        }
+        super.append(spannableStringBuilder, 0,spannableStringBuilder.length());
     }
 }
