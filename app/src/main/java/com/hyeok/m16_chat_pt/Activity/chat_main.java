@@ -16,7 +16,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
@@ -24,6 +23,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.hyeok.m16_chat_pt.CustomView.AnsiTextView;
+import com.hyeok.m16_chat_pt.CustomView.SpinnerArrayAdapter;
 import com.hyeok.m16_chat_pt.Utils.BinaryUtil;
 import com.hyeok.m16_chat_pt.Utils.PreferencesControl;
 import com.hyeok.m16_chat_pt.app.R;
@@ -278,7 +278,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
         CHAT_EDITTEXT.setOnClickListener(this);
         CHAT_SCROLL = (ScrollView)findViewById(R.id.CHAT_SCROLL);
         CHAT_SPINNER = (Spinner)findViewById(R.id.CHAT_SPINNER);
-        CHAT_SPINNER.setAdapter(new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.CHAT_SPINNER_ITEM)));
+        CHAT_SPINNER.setAdapter(new SpinnerArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.CHAT_SPINNER_ITEM)));
     }
 
     private void InterrupThread() {

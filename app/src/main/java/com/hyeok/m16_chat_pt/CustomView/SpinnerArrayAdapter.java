@@ -1,0 +1,35 @@
+package com.hyeok.m16_chat_pt.CustomView;
+
+import android.content.Context;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.TextView;
+
+/**
+ * Created by GwonHyeok on 2014. 6. 12..
+ */
+public class SpinnerArrayAdapter<String> extends ArrayAdapter {
+    private Context context;
+    private String[] items;
+
+    public SpinnerArrayAdapter(Context context, int resource, String[] objects) {
+        super(context, resource, objects);
+        this.context = context;
+        this.items = objects;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if(convertView == null) {
+            LayoutInflater inflater = LayoutInflater.from(context);
+            convertView = inflater.inflate(android.R.layout.simple_spinner_item, parent, false);
+        }
+        TextView itemtv = (TextView)convertView.findViewById(android.R.id.text1);
+        itemtv.setText((CharSequence)items[position]);
+        itemtv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        return convertView;
+    }
+}
