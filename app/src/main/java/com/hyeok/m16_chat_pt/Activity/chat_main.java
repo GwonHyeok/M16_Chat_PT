@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.hyeok.m16_chat_pt.CustomView.AnsiTextView;
 import com.hyeok.m16_chat_pt.Utils.BinaryUtil;
+import com.hyeok.m16_chat_pt.Utils.PreferencesControl;
 import com.hyeok.m16_chat_pt.app.R;
 
 import java.io.BufferedReader;
@@ -41,16 +42,17 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
     private EditText CHAT_EDITTEXT;
     private ScrollView CHAT_SCROLL;
     private Spinner CHAT_SPINNER;
-    private Handler CHAT_TV_HANDLER;
-    private final String ID = "m16";
-    private final String PW = "aa";
+    private Handler CHAT_TV_HANDLER, CHAT_TOAST_HANDLER;
     private ChatOutputStream chatOutputStream;
+    private ChatInputStream chatInputStream;
+    private ErrorStream errorStream;
+    private Process process;
+    private boolean SHOW_CHAT_START = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_main);
-        BinaryUtil.getInstance().CheckBinaryFile(this);
         ViewInit();
         ChatInit();
         HandlerInit();
@@ -80,6 +82,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
     @Override
     public void onDestroy() {
         super.onDestroy();
+        InterrupThread();
         NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(0);
     }
@@ -143,22 +146,22 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
             }
         });
     }
+
     private void ChatInit() {
         try {
             String FILE_DIR = BinaryUtil.getInstance().GetBinaryPath(this);
             Log.i(TAG, "ChatInit()");
             Log.i(TAG, FILE_DIR);
-            Process process = Runtime.getRuntime().exec(FILE_DIR+" -a --client=W3XP  m16-chat.ggu.la");
+            process = Runtime.getRuntime().exec(FILE_DIR+" -a --client=W3XP  m16-chat.ggu.la");
             // 입력 스트림
             OutputStream outputStream = process.getOutputStream();
             chatOutputStream = new ChatOutputStream(outputStream);
             // 기본 스트림 출력.
             InputStream inputStream = process.getInputStream();
-            ChatInputStream chatInputStream = new ChatInputStream(inputStream);
-
+            chatInputStream = new ChatInputStream(inputStream);
             // 에러 스트림 출력.
             InputStream errorinputStream = process.getErrorStream();
-            ErrorStream errorStream = new ErrorStream(errorinputStream);
+            errorStream = new ErrorStream(errorinputStream);
             // 스레드 실행.
             chatOutputStream.start();
             chatInputStream.start();
@@ -194,8 +197,8 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
         @Override
         public void run() {
             try {
-                chatoutputStream.write((ID + "\n").getBytes());
-                chatoutputStream.write((PW + "\n").getBytes());
+                chatoutputStream.write((PreferencesControl.getInstance(chat_main.this).getValue(PreferencesControl.USER_DATA_PREF, PreferencesControl.USER_NAME, null) + "\n").getBytes());
+                chatoutputStream.write((PreferencesControl.getInstance(chat_main.this).getValue(PreferencesControl.USER_DATA_PREF, PreferencesControl.USER_PWD, null) + "\n").getBytes());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -241,9 +244,25 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
         public void run() {
             BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
             String temp = null;
+            Message msg = new Message();
             try {
                 while ((temp = in.readLine()) != null) {
                     Log.i(TAG, temp);
+                    // Login Fail Check
+                    if(temp.equals("Login incorrect.")) {
+                        PreferencesControl.getInstance(chat_main.this).clearAll(PreferencesControl.USER_DATA_PREF);
+                        overridePendingTransition(R.anim.fade, R.anim.fade);
+                        finish();
+                        startActivity(new Intent(chat_main.this, chat_login.class));
+                        msg.obj = "로그인에 실패하였습니다.";
+                        CHAT_TOAST_HANDLER.sendMessage(msg);
+                        InterrupThread();
+                    } else if(temp.equals("server closed connection")) {
+                        msg.obj = "서버와의 연결이 끊겼습니다.";
+                        finish();
+                        CHAT_TOAST_HANDLER.sendMessage(msg);
+                        InterrupThread();
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -262,13 +281,34 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
         CHAT_SPINNER.setAdapter(new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.CHAT_SPINNER_ITEM)));
     }
 
+    private void InterrupThread() {
+        chatOutputStream.interrupt();
+        chatInputStream.interrupt();
+        errorStream.interrupt();
+        process.destroy();
+    }
+
     private void HandlerInit() {
+        CHAT_TOAST_HANDLER = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                Toast.makeText(chat_main.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
+            }
+        };
+
         CHAT_TV_HANDLER = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                CHAT_TEXTVIEW.append((String) msg.obj);
-                CHAT_TEXTVIEW.append("\n");
-                ScrollDown();
+                // Not Showing during Login Work
+                assert ((String) msg.obj) != null;
+                if(((String) msg.obj).contains("Joining")) {
+                    SHOW_CHAT_START = true;
+                }
+                if(SHOW_CHAT_START) {
+                    CHAT_TEXTVIEW.append((String) msg.obj);
+                    CHAT_TEXTVIEW.append("\n");
+                    ScrollDown();
+                }
             }
         };
     }
