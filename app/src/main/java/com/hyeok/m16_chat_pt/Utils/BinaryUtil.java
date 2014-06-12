@@ -51,6 +51,9 @@ public class BinaryUtil {
             while((read = in.read(buffer)) != -1) {
                 op.write(buffer, 0, read);
             }
+            in.close();
+            op.flush();
+            op.close();
             new File(DATA_FOLDER_BNCHAT).setExecutable(true);
             Log.i(TAG, mContext.getFilesDir().getAbsoluteFile().toString());
             Log.i(TAG, "File Copy Success");
