@@ -114,7 +114,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
         } else if(v.getId() == CHAT_EDITTEXT.getId()) {
                 ScrollDown();
         } else if(v.getId() == FRIEND_Button.getId()) {
-            chatOutputStream.sendMessage("/f apilist");
+            chatOutputStream.sendMessage("/c apilist");
         }
     }
 
@@ -361,7 +361,11 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
                                 return;
                             }
                             JSONObject obj = (JSONObject) parser.parse(json);
-                            Log.d("FParser", "");
+                            Log.d("FParser", "no : "+ (String) obj.get("no"));
+                            Log.d("FParser", "id : "+ (String) obj.get("id"));
+                            Log.d("FParser", "level : "+ (String) obj.get("level"));
+                            Log.d("FParser", "status : "+ (String) obj.get("status"));
+                            Log.d("FPatser", "game_name : "+ (String) obj.get("game_name"));
                         } catch (ParseException e) {
                             SHOW_FRIEND_LIST = false;
                             SHOW_CHAT_START = true;
