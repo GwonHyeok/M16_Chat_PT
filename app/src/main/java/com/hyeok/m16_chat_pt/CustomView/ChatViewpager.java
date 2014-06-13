@@ -1,0 +1,99 @@
+package com.hyeok.m16_chat_pt.CustomView;
+
+import android.annotation.TargetApi;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
+import android.widget.ListView;
+import android.widget.ScrollView;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by GwonHyeok on 2014. 6. 14..
+ */
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+public class ChatViewpager extends Fragment {
+    private static final String ARG_POSITION = "position";
+    public static ScrollView CHAT_SCROLL = null;
+    public static AnsiTextView CHAT_TEXTVIEW = null;
+    public static ListView CHAT_FRIEND_LISTVIEW = null, CHAT_CLAN_LISTVIEW = null;
+    public static List<String> CHAT_FRIEND_LIST = null, CHAT_CLAN_LIST = null;
+    private FrameLayout chatfl;
+    private FrameLayout friendfl;
+    private FrameLayout clanfl;
+    private int position;
+
+    public static ChatViewpager newInstance(int position) {
+        ChatViewpager f = new ChatViewpager();
+        Bundle b = new Bundle();
+        b.putInt(ARG_POSITION, position);
+        f.setArguments(b);
+        return f;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        position = getArguments().getInt(ARG_POSITION);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT);
+        if(chatfl == null) {
+            chatfl = new FrameLayout(getActivity());
+            friendfl = new FrameLayout(getActivity());
+            clanfl = new FrameLayout(getActivity());
+            chatfl.setLayoutParams(params);
+            friendfl.setLayoutParams(params);
+            clanfl.setLayoutParams(params);
+        }
+        switch (position) {
+            case 0:
+                if(CHAT_SCROLL == null) {
+                    CHAT_SCROLL = new ScrollView(getActivity());
+                    CHAT_TEXTVIEW = new AnsiTextView(getActivity());
+                    CHAT_SCROLL.addView(CHAT_TEXTVIEW);
+                    chatfl.addView(CHAT_SCROLL);
+                }
+                if(chatfl.getParent() != null)
+                    ((ViewGroup)chatfl.getParent()).removeAllViews();
+                return chatfl;
+            case 1:
+                if(CHAT_FRIEND_LISTVIEW == null) {
+                    CHAT_FRIEND_LISTVIEW = new ListView(getActivity());
+                    CHAT_FRIEND_LIST = new ArrayList<String>();
+                    CHAT_FRIEND_LISTVIEW.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, CHAT_FRIEND_LIST));
+                    friendfl.addView(CHAT_FRIEND_LISTVIEW);
+                }
+                if(friendfl.getParent() != null)
+                    ((ViewGroup)friendfl.getParent()).removeAllViews();
+                return friendfl;
+            case 2:
+                if(CHAT_CLAN_LISTVIEW == null) {
+                    CHAT_CLAN_LISTVIEW = new ListView(getActivity());
+                    CHAT_CLAN_LIST = new ArrayList<String>();
+                    CHAT_CLAN_LISTVIEW.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, CHAT_CLAN_LIST));
+                    clanfl.addView(CHAT_CLAN_LISTVIEW);
+                }
+                if(clanfl.getParent() != null)
+                    ((ViewGroup)clanfl.getParent()).removeAllViews();
+                return clanfl;
+        }
+        return null;
+    }
+
+}

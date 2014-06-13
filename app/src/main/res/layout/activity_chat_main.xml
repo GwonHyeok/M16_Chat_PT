@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,30 +6,31 @@
     android:weightSum="100"
     tools:context="com.hyeok.m16_chat_pt.Activity.chat_main">
 
-    <Button
-        android:id="@+id/FRIEND"
-        android:layout_width="60dp"
-        android:layout_height="40dp" />
-
-    <ScrollView
-        android:id="@+id/CHAT_SCROLL"
+    <com.hyeok.m16_chat_pt.CustomView.PagerSlidingTabStrip xmlns:PagerSlidingTabStrip="http://schemas.android.com/apk/res/com.hyeok.m16_chat_pt.app"
+        android:id="@+id/CHAT_TABS"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="90">
+        android:layout_height="48dip"
+        android:background="@color/background_tab_pressed"
+        PagerSlidingTabStrip:pstsDividerColor="@color/background_tab_pressed"
+        PagerSlidingTabStrip:pstsIndicatorHeight="4dp"
+        PagerSlidingTabStrip:pstsUnderlineColor="#898a8a" />
 
-        <com.hyeok.m16_chat_pt.CustomView.AnsiTextView
-            android:id="@+id/CHAT_VIEW"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="" />
-    </ScrollView>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/CHAT_VIEWPAGER"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".Activity.chat_main"
+        android:layout_above="@+id/linearLayout"
+        android:layout_below="@+id/CHAT_TABS" />
 
     <LinearLayout
+        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="10"
+        android:layout_height="50dp"
+        android:background="@drawable/border_chat_sender"
         android:orientation="horizontal"
-        android:weightSum="100">
+        android:weightSum="100"
+        android:id="@+id/linearLayout">
 
         <Spinner
             android:id="@+id/CHAT_SPINNER"
@@ -48,8 +49,8 @@
         <Button
             android:id="@+id/CHAT_BUTTON"
             android:layout_width="0dp"
-            android:text="전송"
             android:layout_height="fill_parent"
-            android:layout_weight="20" />
+            android:layout_weight="20"
+            android:text="전송" />
     </LinearLayout>
-</LinearLayout>
+</RelativeLayout>

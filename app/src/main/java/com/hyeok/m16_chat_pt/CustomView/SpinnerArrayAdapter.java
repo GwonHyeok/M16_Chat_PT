@@ -22,6 +22,15 @@ public class SpinnerArrayAdapter<String> extends ArrayAdapter {
     }
 
     @Override
+    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+        View view = super.getDropDownView(position, convertView, parent);
+        TextView text = (TextView) view.findViewById(android.R.id.text1);
+//        text.setBackgroundColor(0xff00ff00); 스피너 눌렀을시 색상 변경.
+        return view;
+    }
+
+
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if(convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(context);
@@ -30,6 +39,7 @@ public class SpinnerArrayAdapter<String> extends ArrayAdapter {
         TextView itemtv = (TextView)convertView.findViewById(android.R.id.text1);
         itemtv.setText((CharSequence)items[position]);
         itemtv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+//        itemtv.setBackgroundColor(0xff00ff00); 스피너 메인 색상.
         return convertView;
     }
 }

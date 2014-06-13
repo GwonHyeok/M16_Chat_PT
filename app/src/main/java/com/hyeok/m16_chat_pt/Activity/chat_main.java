@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -22,8 +23,10 @@ import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.hyeok.m16_chat_pt.CustomView.AnsiTextView;
+import com.hyeok.m16_chat_pt.CustomView.ChatViewpager;
+import com.hyeok.m16_chat_pt.CustomView.PagerSlidingTabStrip;
 import com.hyeok.m16_chat_pt.CustomView.SpinnerArrayAdapter;
+import com.hyeok.m16_chat_pt.CustomView.ViewPagerAdapter;
 import com.hyeok.m16_chat_pt.Utils.BinaryUtil;
 import com.hyeok.m16_chat_pt.Utils.PreferencesControl;
 import com.hyeok.m16_chat_pt.app.R;
@@ -39,15 +42,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 
-public class chat_main extends ActionBarActivity implements View.OnClickListener{
+public class chat_main extends ActionBarActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {
     private String TAG = "M16_CHAT";
-    private AnsiTextView CHAT_TEXTVIEW;
-    private Button CHAT_BUTTON, FRIEND_Button;
+    private PagerSlidingTabStrip pagerSlidingTabStrip;
+    private ViewPager viewPager;
+    private ViewPagerAdapter viewPagerAdapter;
+    private Button CHAT_BUTTON;
     private EditText CHAT_EDITTEXT;
-    private ScrollView CHAT_SCROLL;
     private Spinner CHAT_SPINNER;
     private Handler CHAT_TV_HANDLER, CHAT_TOAST_HANDLER;
-    private ChatOutputStream chatOutputStream;
+    private static ChatOutputStream chatOutputStream;
     private ChatInputStream chatInputStream;
     private ErrorStream errorStream;
     private Process process;
@@ -101,9 +105,17 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
                         chatOutputStream.sendMessage(CHAT_EDITTEXT.getText().toString());
                         break;
                     case 1: // 친구에게...
+                        if(CHAT_EDITTEXT.getText().toString().substring(0,1).equals("/")) {
+                            chatOutputStream.sendMessage(CHAT_EDITTEXT.getText().toString());
+                            break;
+                        }
                         chatOutputStream.sendMessage("/f msg "+CHAT_EDITTEXT.getText().toString());
                         break;
                     case 2: // 클랜에게...
+                        if(CHAT_EDITTEXT.getText().toString().substring(0,1).equals("/")) {
+                            chatOutputStream.sendMessage(CHAT_EDITTEXT.getText().toString());
+                            break;
+                        }
                         chatOutputStream.sendMessage("/c msg "+CHAT_EDITTEXT.getText().toString());
                         break;
                 }
@@ -113,8 +125,6 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
             }
         } else if(v.getId() == CHAT_EDITTEXT.getId()) {
                 ScrollDown();
-        } else if(v.getId() == FRIEND_Button.getId()) {
-            chatOutputStream.sendMessage("/c apilist");
         }
     }
 
@@ -145,10 +155,10 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
     }
 
     private void ScrollDown() {
-        CHAT_SCROLL.post(new Runnable() {
+        ChatViewpager.CHAT_SCROLL.post(new Runnable() {
             @Override
             public void run() {
-                CHAT_SCROLL.fullScroll(ScrollView.FOCUS_DOWN);
+                ChatViewpager.CHAT_SCROLL.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
     }
@@ -175,6 +185,29 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        if(position == 1) {
+            ChatViewpager.CHAT_FRIEND_LIST.clear();
+            ChatViewpager.CHAT_FRIEND_LISTVIEW.invalidateViews();
+            GetFrientList();
+        } else if(position == 2) {
+            ChatViewpager.CHAT_CLAN_LIST.clear();
+            ChatViewpager.CHAT_CLAN_LISTVIEW.invalidateViews();
+            GetClanList();
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
     }
 
     class ChatOutputStream extends Thread {
@@ -277,18 +310,31 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
     }
 
     private void ViewInit() {
-        CHAT_TEXTVIEW = (AnsiTextView)findViewById(R.id.CHAT_VIEW);
+//        CHAT_TEXTVIEW = (AnsiTextView)findViewById(R.id.CHAT_VIEW);
         CHAT_BUTTON = (Button)findViewById(R.id.CHAT_BUTTON);
         CHAT_EDITTEXT = (EditText)findViewById(R.id.CHAT_EDITTEXT);
         CHAT_BUTTON.setOnClickListener(this);
         CHAT_EDITTEXT.setOnClickListener(this);
-        CHAT_SCROLL = (ScrollView)findViewById(R.id.CHAT_SCROLL);
+//        CHAT_SCROLL = (ScrollView)findViewById(R.id.CHAT_SCROLL);
         CHAT_SPINNER = (Spinner)findViewById(R.id.CHAT_SPINNER);
         CHAT_SPINNER.setAdapter(new SpinnerArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.CHAT_SPINNER_ITEM)));
-        // test
-        FRIEND_Button = (Button)findViewById(R.id.FRIEND);
-        FRIEND_Button.setOnClickListener(this);
 
+        // Tab, pager Initiallize
+        pagerSlidingTabStrip = (PagerSlidingTabStrip)findViewById(R.id.CHAT_TABS);
+        viewPager = (ViewPager)findViewById(R.id.CHAT_VIEWPAGER);
+        viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(viewPagerAdapter);
+        pagerSlidingTabStrip.setViewPager(viewPager);
+        pagerSlidingTabStrip.setOnPageChangeListener(this);
+
+    }
+
+    private void GetClanList() {
+        chatOutputStream.sendMessage("/c apilist");
+    }
+
+    private void GetFrientList() {
+        chatOutputStream.sendMessage("/f apilist");
     }
 
     private void InterrupThread() {
@@ -322,8 +368,8 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
                         SHOW_CLAN_LIST = true;
                     }
                     if (SHOW_CHAT_START) {
-                        CHAT_TEXTVIEW.append((String) msg.obj);
-                        CHAT_TEXTVIEW.append("\n");
+                        ChatViewpager.CHAT_TEXTVIEW.append((String) msg.obj);
+                        ChatViewpager.CHAT_TEXTVIEW.append("\n");
                         ScrollDown();
                     }
                 } else {
@@ -339,6 +385,8 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
                                 return;
                             }
                             JSONObject obj = (JSONObject) parser.parse(json);
+                            ChatViewpager.CHAT_FRIEND_LIST.add(obj.get("id").toString());
+                            ChatViewpager.CHAT_FRIEND_LISTVIEW.invalidateViews();
                             Log.d("FParser", "no : " + (String) obj.get("no"));
                             Log.d("FParser", "id : " + (String) obj.get("id"));
                             Log.d("FParser", "channel : " + (String) obj.get("channel"));
@@ -361,6 +409,8 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
                                 return;
                             }
                             JSONObject obj = (JSONObject) parser.parse(json);
+                            ChatViewpager.CHAT_CLAN_LIST.add(obj.get("id").toString());
+                            ChatViewpager.CHAT_CLAN_LISTVIEW.invalidateViews();
                             Log.d("FParser", "no : "+ (String) obj.get("no"));
                             Log.d("FParser", "id : "+ (String) obj.get("id"));
                             Log.d("FParser", "level : "+ (String) obj.get("level"));
