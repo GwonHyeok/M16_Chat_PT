@@ -28,6 +28,10 @@ import com.hyeok.m16_chat_pt.Utils.BinaryUtil;
 import com.hyeok.m16_chat_pt.Utils.PreferencesControl;
 import com.hyeok.m16_chat_pt.app.R;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +42,7 @@ import java.io.OutputStream;
 public class chat_main extends ActionBarActivity implements View.OnClickListener{
     private String TAG = "M16_CHAT";
     private AnsiTextView CHAT_TEXTVIEW;
-    private Button CHAT_BUTTON;
+    private Button CHAT_BUTTON, FRIEND_Button;
     private EditText CHAT_EDITTEXT;
     private ScrollView CHAT_SCROLL;
     private Spinner CHAT_SPINNER;
@@ -47,7 +51,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
     private ChatInputStream chatInputStream;
     private ErrorStream errorStream;
     private Process process;
-    private boolean SHOW_CHAT_START = false;
+    private boolean SHOW_CHAT_START = false, SHOW_FRIEND_LIST = false, SHOW_CLAN_LIST = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +113,8 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
             }
         } else if(v.getId() == CHAT_EDITTEXT.getId()) {
                 ScrollDown();
+        } else if(v.getId() == FRIEND_Button.getId()) {
+            chatOutputStream.sendMessage("/f apilist");
         }
     }
 
@@ -279,6 +285,10 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
         CHAT_SCROLL = (ScrollView)findViewById(R.id.CHAT_SCROLL);
         CHAT_SPINNER = (Spinner)findViewById(R.id.CHAT_SPINNER);
         CHAT_SPINNER.setAdapter(new SpinnerArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.CHAT_SPINNER_ITEM)));
+        // test
+        FRIEND_Button = (Button)findViewById(R.id.FRIEND);
+        FRIEND_Button.setOnClickListener(this);
+
     }
 
     private void InterrupThread() {
@@ -299,15 +309,66 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
         CHAT_TV_HANDLER = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                // Not Showing during Login Work
-                assert ((String) msg.obj) != null;
-                if(((String) msg.obj).contains("Joining")) {
-                    SHOW_CHAT_START = true;
-                }
-                if(SHOW_CHAT_START) {
-                    CHAT_TEXTVIEW.append((String) msg.obj);
-                    CHAT_TEXTVIEW.append("\n");
-                    ScrollDown();
+                if (!SHOW_FRIEND_LIST && !SHOW_CLAN_LIST) {
+                    // Not Showing during Login Work
+                    assert ((String) msg.obj) != null;
+                    if (((String) msg.obj).contains("Joining")) {
+                        SHOW_CHAT_START = true;
+                    } else if (((String) msg.obj).contains("{@startfriend}")) {
+                        SHOW_CHAT_START = false;
+                        SHOW_FRIEND_LIST = true;
+                    } else if (((String) msg.obj).contains("{@startclan}")) {
+                        SHOW_CHAT_START = false;
+                        SHOW_CLAN_LIST = true;
+                    }
+                    if (SHOW_CHAT_START) {
+                        CHAT_TEXTVIEW.append((String) msg.obj);
+                        CHAT_TEXTVIEW.append("\n");
+                        ScrollDown();
+                    }
+                } else {
+                    if (SHOW_FRIEND_LIST) {
+                        //친구 정보 json 파싱.
+                        try {
+                            JSONParser parser = new JSONParser();
+                            assert ((String) msg.obj) != null;
+                            String json = ((String) msg.obj).substring(9, ((String) msg.obj).length());
+                            if (((String) msg.obj).contains("{@end}")) {
+                                SHOW_FRIEND_LIST = false;
+                                SHOW_CHAT_START = true;
+                                return;
+                            }
+                            JSONObject obj = (JSONObject) parser.parse(json);
+                            Log.d("FParser", "no : " + (String) obj.get("no"));
+                            Log.d("FParser", "id : " + (String) obj.get("id"));
+                            Log.d("FParser", "channel : " + (String) obj.get("channel"));
+                            Log.d("FParser", "game_name : " + (String) obj.get("game_name"));
+                            Log.d("FParser", "time : " + (String) obj.get("time"));
+                        } catch (ParseException e) {
+                            SHOW_FRIEND_LIST = false;
+                            SHOW_CHAT_START = true;
+                            e.printStackTrace();
+                        }
+                    } else if (SHOW_CLAN_LIST) {
+                        //클랜 정보 json 파싱.
+                        try {
+                            JSONParser parser = new JSONParser();
+                            assert ((String) msg.obj) != null;
+                            String json = ((String) msg.obj).substring(9, ((String) msg.obj).length());
+                            if (((String) msg.obj).contains("{@end}")) {
+                                SHOW_CLAN_LIST = false;
+                                SHOW_CHAT_START = true;
+                                return;
+                            }
+                            JSONObject obj = (JSONObject) parser.parse(json);
+                            Log.d("FParser", "");
+                        } catch (ParseException e) {
+                            SHOW_FRIEND_LIST = false;
+                            SHOW_CHAT_START = true;
+                            e.printStackTrace();
+                        }
+                    }
+
                 }
             }
         };
