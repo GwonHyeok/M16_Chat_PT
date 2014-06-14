@@ -266,7 +266,8 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
         } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
             width = dimension.widthPixels;
         }
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width / 5, ViewGroup.LayoutParams.MATCH_PARENT);
+        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, getContext().getResources().getDisplayMetrics());
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams((width-(int)px) / 3, ViewGroup.LayoutParams.MATCH_PARENT);
         for (int i = 0; i < tabCount; i++) {
             View v = tabsContainer.getChildAt(i);
             if (v instanceof TextView) {

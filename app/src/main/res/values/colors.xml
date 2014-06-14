@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="background_tab">#FFFED231</color>
+    <color name="background_tab_underline">#FFFC5D21</color>
     <color name="background_tab_pressed">#6633B5E5</color>
+
+    <!-- App Main Color Resources-->
+    <color name="background_spinner">#FFFEEA77</color>
+    <color name="background_button">#FFFEC0F2</color>
 </resources>

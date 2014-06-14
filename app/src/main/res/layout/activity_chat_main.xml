@@ -1,56 +1,119 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/CHAT_MAIN_LAYOUT"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="100"
     tools:context="com.hyeok.m16_chat_pt.Activity.chat_main">
 
-    <com.hyeok.m16_chat_pt.CustomView.PagerSlidingTabStrip xmlns:PagerSlidingTabStrip="http://schemas.android.com/apk/res/com.hyeok.m16_chat_pt.app"
-        android:id="@+id/CHAT_TABS"
-        android:layout_width="match_parent"
-        android:layout_height="48dip"
-        android:background="@color/background_tab_pressed"
-        PagerSlidingTabStrip:pstsDividerColor="@color/background_tab_pressed"
-        PagerSlidingTabStrip:pstsIndicatorHeight="4dp"
-        PagerSlidingTabStrip:pstsUnderlineColor="#898a8a" />
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/CHAT_VIEWPAGER"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:context=".Activity.chat_main"
-        android:layout_above="@+id/linearLayout"
-        android:layout_below="@+id/CHAT_TABS" />
+        <RelativeLayout
+            android:id="@+id/CHAT_LAYOUT"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="50dp"
+            android:background="@color/background_tab">
+
+            <com.hyeok.m16_chat_pt.CustomView.PagerSlidingTabStrip xmlns:PagerSlidingTabStrip="http://schemas.android.com/apk/res/com.hyeok.m16_chat_pt.app"
+                android:id="@+id/CHAT_TABS"
+                android:layout_width="wrap_content"
+                android:layout_height="48dip"
+                android:background="@color/background_tab"
+                PagerSlidingTabStrip:pstsDividerColor="@color/background_tab"
+                PagerSlidingTabStrip:pstsIndicatorColor="@color/background_tab_underline"
+                PagerSlidingTabStrip:pstsIndicatorHeight="4dp" />
+
+            <Button
+                android:id="@+id/CHAT_CHANNEL_USER_BUTTON"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/ic_launcher" />
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/CHAT_VIEWPAGER"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFBED1DC"
+                tools:context=".Activity.chat_main"
+                android:layout_below="@+id/CHAT_TABS" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:weightSum="100"
+            android:background="@android:color/white"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
+
+            <Spinner
+                android:id="@+id/CHAT_SPINNER"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center"
+                android:layout_weight="20"
+                android:background="@color/background_spinner"
+                android:gravity="center" />
+
+            <EditText
+                android:id="@+id/CHAT_EDITTEXT"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_marginTop="2dp"
+                android:layout_weight="60"
+                android:background="@null"
+                android:cursorVisible="false"
+                android:textColor="@android:color/black" />
+
+            <Button
+                android:id="@+id/CHAT_BUTTON"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_marginTop="2dp"
+                android:layout_weight="20"
+                android:background="@color/background_button"
+                android:text="전송" />
+        </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
-        android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@drawable/border_chat_sender"
-        android:orientation="horizontal"
-        android:weightSum="100"
-        android:id="@+id/linearLayout">
+        android:id="@+id/DRAWER_LAYOUT"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="right"
+        android:background="#FFFFFFFF"
+        android:orientation="vertical"
+        android:padding="5dp" >
 
-        <Spinner
-            android:id="@+id/CHAT_SPINNER"
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_weight="20" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_launcher" />
 
-        <EditText
-            android:id="@+id/CHAT_EDITTEXT"
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_weight="60"
-            android:hint="텍스트를 입력하세요."
-            android:textColor="@android:color/black" />
+       <TextView
+           android:paddingTop="10dp"
+           android:layout_gravity="center"
+           android:gravity="center"
+           android:textSize="18sp"
+           android:id="@+id/CHANNEL_USER_TEXTVIEW"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text=""/>
 
-        <Button
-            android:id="@+id/CHAT_BUTTON"
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_weight="20"
-            android:text="전송" />
+       <ListView
+           android:id="@+id/CHANNEL_USER_LISTVIEW"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"/>
+
     </LinearLayout>
-</RelativeLayout>
+</android.support.v4.widget.DrawerLayout>

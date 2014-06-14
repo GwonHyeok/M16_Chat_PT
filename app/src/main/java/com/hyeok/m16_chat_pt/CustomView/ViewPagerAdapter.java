@@ -8,7 +8,7 @@ import android.support.v4.app.FragmentPagerAdapter;
  */
 public class ViewPagerAdapter extends FragmentPagerAdapter {
 
-    String TITLES[] = {"현재채널", "친구목록", "클랜목록"};
+    String TITLES[] = {"현재채널", "친구목록", "클랜"};
     public ViewPagerAdapter(FragmentManager fm) {
         super(fm);
     }

@@ -6,21 +6,27 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hyeok.m16_chat_pt.CustomView.ChatViewpager;
@@ -41,6 +47,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 
 public class chat_main extends ActionBarActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {
@@ -48,15 +55,21 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
     private PagerSlidingTabStrip pagerSlidingTabStrip;
     private ViewPager viewPager;
     private ViewPagerAdapter viewPagerAdapter;
-    private Button CHAT_BUTTON;
+    private Button CHAT_BUTTON, CHAT_CHANNEL_BUTTON;
     private EditText CHAT_EDITTEXT;
     private Spinner CHAT_SPINNER;
-    private Handler CHAT_TV_HANDLER, CHAT_TOAST_HANDLER;
+    private Handler CHAT_TV_HANDLER, CHAT_TOAST_HANDLER, BACK_PRESSED_HANDLER;
     private static ChatOutputStream chatOutputStream;
     private ChatInputStream chatInputStream;
     private ErrorStream errorStream;
     private Process process;
     private boolean SHOW_CHAT_START = false, SHOW_FRIEND_LIST = false, SHOW_CLAN_LIST = false;
+    private ArrayList<String> CHANNEL_USER_LIST;
+    private DrawerLayout CHAT_MAIN_LAYOUT;
+    private LinearLayout CHANNEL_USER_LIST_LAYOUT;
+    private ListView CHANNEL_USER_LISTVIEW;
+    private static int BACK_PRESSED_NUM;
+    private TextView CHANNEL_USER_TEXTVIEW;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +140,10 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
             }
         } else if(v.getId() == CHAT_EDITTEXT.getId()) {
                 ScrollDown();
+        } else if(v.getId() == CHAT_CHANNEL_BUTTON.getId()) {
+            CHAT_MAIN_LAYOUT.openDrawer(CHANNEL_USER_LIST_LAYOUT);
+            for(String user : CHANNEL_USER_LIST) {
+            }
         }
     }
 
@@ -188,6 +205,39 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        if(CHAT_MAIN_LAYOUT.isDrawerOpen(CHANNEL_USER_LIST_LAYOUT)) {
+            CHAT_MAIN_LAYOUT.closeDrawer(CHANNEL_USER_LIST_LAYOUT);
+            return;
+        }
+        BACK_PRESSED_NUM++;
+        BACK_PRESSED_HANDLER.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                BACK_PRESSED_NUM = 0;
+            }
+        }, 2000);
+        if(BACK_PRESSED_NUM == 2) {
+            super.onBackPressed();
+            return;
+        }
+        Toast.makeText(this, "뒤로가기키를 한번더 누르면 종료됩니다.", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onResume() {
+        SetTabWidth();
+        super.onResume();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newconfiguration) {
+        SetTabWidth();
+        super.onConfigurationChanged(newconfiguration);
+    }
+
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -318,6 +368,17 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
         CHAT_EDITTEXT.setOnClickListener(this);
         CHAT_SPINNER = (Spinner)findViewById(R.id.CHAT_SPINNER);
         CHAT_SPINNER.setAdapter(new SpinnerArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.CHAT_SPINNER_ITEM)));
+        CHAT_CHANNEL_BUTTON = (Button)findViewById(R.id.CHAT_CHANNEL_USER_BUTTON);
+        CHAT_CHANNEL_BUTTON.setOnClickListener(this);
+        CHAT_MAIN_LAYOUT = (DrawerLayout)findViewById(R.id.CHAT_MAIN_LAYOUT);
+        CHANNEL_USER_LIST_LAYOUT = (LinearLayout)findViewById(R.id.DRAWER_LAYOUT);
+        CHANNEL_USER_LISTVIEW = (ListView)findViewById(R.id.CHANNEL_USER_LISTVIEW);
+        CHANNEL_USER_TEXTVIEW = (TextView)findViewById(R.id.CHANNEL_USER_TEXTVIEW);
+
+        // CHANNEL_USER_LIST Initialize
+        CHANNEL_USER_LIST = new ArrayList<String>();
+        // CHANNEL_USER_LISTVEW SET ADAPTER
+        CHANNEL_USER_LISTVIEW.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, CHANNEL_USER_LIST));
 
         // Tab, pager Initiallize
         pagerSlidingTabStrip = (PagerSlidingTabStrip)findViewById(R.id.CHAT_TABS);
@@ -327,6 +388,16 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
         pagerSlidingTabStrip.setViewPager(viewPager);
         pagerSlidingTabStrip.setOnPageChangeListener(this);
 
+        // Hide Action Bar
+        getSupportActionBar().hide();
+    }
+
+    private void SetTabWidth() {
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            pagerSlidingTabStrip.setTabsWidth(Configuration.ORIENTATION_LANDSCAPE);
+        } else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            pagerSlidingTabStrip.setTabsWidth(Configuration.ORIENTATION_PORTRAIT);
+        }
     }
 
     private void GetClanList() {
@@ -345,6 +416,8 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
     }
 
     private void HandlerInit() {
+        BACK_PRESSED_HANDLER = new Handler();
+
         CHAT_TOAST_HANDLER = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -358,8 +431,10 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
                 if (!SHOW_FRIEND_LIST && !SHOW_CLAN_LIST) {
                     // Not Showing during Login Work
                     assert ((String) msg.obj) != null;
-                    if (((String) msg.obj).contains("Joining")) {
+                    if (((String) msg.obj).contains("Joining channel :")) {
                         SHOW_CHAT_START = true;
+                        CHANNEL_USER_LIST.clear();
+                        CHANNEL_USER_TEXTVIEW.setText("현재체널 : " + msg.obj.toString().split("Joining channel :\"")[1].split("\"")[0]);
                     } else if (((String) msg.obj).contains("{@startfriend}")) {
                         SHOW_CHAT_START = false;
                         SHOW_FRIEND_LIST = true;
@@ -367,8 +442,26 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
                         SHOW_CHAT_START = false;
                         SHOW_CLAN_LIST = true;
                     }
+
+                    // Channel Already Exist User
+                    if (((String) msg.obj).contains("] is here")) {
+                        CHANNEL_USER_LIST.add(msg.obj.toString().substring(9, ((String) msg.obj).length()).split(" \\[")[0].replaceAll("\"", ""));
+                        CHANNEL_USER_LISTVIEW.invalidateViews();
+                    }
+                    // Channel New Join User
+                    if (((String) msg.obj).contains("] enters")) {
+                        CHANNEL_USER_LIST.add(msg.obj.toString().substring(6, msg.obj.toString().length()).split(" \\[")[0].replaceAll("\"", ""));
+                        CHANNEL_USER_LISTVIEW.invalidateViews();
+                    }
+
+                    // Channel Remove User
+                    if (((String) msg.obj).contains("] leaves")) {
+                        CHANNEL_USER_LIST.remove(msg.obj.toString().substring(6, msg.obj.toString().length()).split(" \\[")[0].replaceAll("\"", ""));
+                        CHANNEL_USER_LISTVIEW.invalidateViews();
+                    }
+
                     if (SHOW_CHAT_START) {
-                        if(ChatViewpager.CHAT_TEXTVIEW == null) return;
+                        if (ChatViewpager.CHAT_TEXTVIEW == null) return;
                         ChatViewpager.CHAT_TEXTVIEW.append((String) msg.obj);
                         ChatViewpager.CHAT_TEXTVIEW.append("\n");
                         ScrollDown();
@@ -396,12 +489,12 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
                             }
                             ChatViewpager.CHAT_FRIEND_LIST.add(new FRCLListViewData(obj.get("id").toString(), Status, (obj.get("status")).equals("오프라인") == true ? false : true));
                             ChatViewpager.CHAT_FRIEND_LISTVIEW.invalidateViews();
-                            Log.d("FParser", "no : " + (String) obj.get("no"));
-                            Log.d("FParser", "id : " + (String) obj.get("id"));
-                            Log.d("FParser", "status : " + (String) obj.get("status"));
-                            Log.d("FParser", "channel : " + (String) obj.get("channel"));
-                            Log.d("FParser", "game_name : " + (String) obj.get("game_name"));
-                            Log.d("FParser", "time : " + (String) obj.get("time"));
+//                            Log.d("FParser", "no : " + (String) obj.get("no"));
+//                            Log.d("FParser", "id : " + (String) obj.get("id"));
+//                            Log.d("FParser", "status : " + (String) obj.get("status"));
+//                            Log.d("FParser", "channel : " + (String) obj.get("channel"));
+//                            Log.d("FParser", "game_name : " + (String) obj.get("game_name"));
+//                            Log.d("FParser", "time : " + (String) obj.get("time"));
                         } catch (ParseException e) {
                             SHOW_FRIEND_LIST = false;
                             SHOW_CHAT_START = true;
@@ -427,11 +520,11 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
                             }
                             ChatViewpager.CHAT_CLAN_LIST.add(new FRCLListViewData(obj.get("id").toString(), Status, (obj.get("status")).equals("오프라인") == true ? false : true));
                             ChatViewpager.CHAT_CLAN_LISTVIEW.invalidateViews();
-                            Log.d("FParser", "no : "+ (String) obj.get("no"));
-                            Log.d("FParser", "id : "+ (String) obj.get("id"));
-                            Log.d("FParser", "level : "+ (String) obj.get("level"));
-                            Log.d("FParser", "status : "+ (String) obj.get("status"));
-                            Log.d("FPatser", "game_name : "+ (String) obj.get("game_name"));
+//                            Log.d("FParser", "no : "+ (String) obj.get("no"));
+//                            Log.d("FParser", "id : "+ (String) obj.get("id"));
+//                            Log.d("FParser", "level : "+ (String) obj.get("level"));
+//                            Log.d("FParser", "status : "+ (String) obj.get("status"));
+//                            Log.d("FPatser", "game_name : "+ (String) obj.get("game_name"));
                         } catch (ParseException e) {
                             SHOW_FRIEND_LIST = false;
                             SHOW_CHAT_START = true;

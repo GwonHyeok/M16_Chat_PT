@@ -39,7 +39,7 @@ public class SpinnerArrayAdapter<String> extends ArrayAdapter {
         TextView itemtv = (TextView)convertView.findViewById(android.R.id.text1);
         itemtv.setText((CharSequence)items[position]);
         itemtv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-//        itemtv.setBackgroundColor(0xff00ff00); 스피너 메인 색상.
+//        itemtv.setBackgroundColor(context.getResources().getColor(R.color.background_spinner)); //스피너 메인 색상.
         return convertView;
     }
 }
