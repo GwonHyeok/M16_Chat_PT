@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/custom_listview_name_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="User Name"
+            android:textSize="20sp" />
+
+        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/custom_listview_info_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/custom_listview_online_image"
+            android:layout_centerVertical="true"
+            android:text="User Status"
+            android:textColor="#ff3d3d3d"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/custom_listview_online_image"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_launcher" />
+    </RelativeLayout>
+
+</LinearLayout>

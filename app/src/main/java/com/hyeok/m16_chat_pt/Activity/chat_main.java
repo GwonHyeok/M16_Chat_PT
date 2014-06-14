@@ -24,6 +24,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.hyeok.m16_chat_pt.CustomView.ChatViewpager;
+import com.hyeok.m16_chat_pt.CustomView.FRCLListViewData;
 import com.hyeok.m16_chat_pt.CustomView.PagerSlidingTabStrip;
 import com.hyeok.m16_chat_pt.CustomView.SpinnerArrayAdapter;
 import com.hyeok.m16_chat_pt.CustomView.ViewPagerAdapter;
@@ -90,6 +91,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
     @Override
     public void onDestroy() {
         super.onDestroy();
+        ChatViewpager.ViewReset();
         InterrupThread();
         NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(0);
@@ -310,12 +312,10 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
     }
 
     private void ViewInit() {
-//        CHAT_TEXTVIEW = (AnsiTextView)findViewById(R.id.CHAT_VIEW);
         CHAT_BUTTON = (Button)findViewById(R.id.CHAT_BUTTON);
         CHAT_EDITTEXT = (EditText)findViewById(R.id.CHAT_EDITTEXT);
         CHAT_BUTTON.setOnClickListener(this);
         CHAT_EDITTEXT.setOnClickListener(this);
-//        CHAT_SCROLL = (ScrollView)findViewById(R.id.CHAT_SCROLL);
         CHAT_SPINNER = (Spinner)findViewById(R.id.CHAT_SPINNER);
         CHAT_SPINNER.setAdapter(new SpinnerArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.CHAT_SPINNER_ITEM)));
 
@@ -368,6 +368,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
                         SHOW_CLAN_LIST = true;
                     }
                     if (SHOW_CHAT_START) {
+                        if(ChatViewpager.CHAT_TEXTVIEW == null) return;
                         ChatViewpager.CHAT_TEXTVIEW.append((String) msg.obj);
                         ChatViewpager.CHAT_TEXTVIEW.append("\n");
                         ScrollDown();
@@ -385,10 +386,19 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
                                 return;
                             }
                             JSONObject obj = (JSONObject) parser.parse(json);
-                            ChatViewpager.CHAT_FRIEND_LIST.add(obj.get("id").toString());
+                            String Status = "";
+                            if (obj.get("status").equals("채팅 중")) {
+                                Status = obj.get("status").toString()+" ("+obj.get("channel").toString()+")";
+                            } else if(obj.get("status").equals("게임 중")) {
+                                Status = obj.get("status").toString()+" ("+obj.get("game_name").toString()+")";
+                            } else if (obj.get("status").equals("오프라인")) {
+                                Status = obj.get("status").toString();
+                            }
+                            ChatViewpager.CHAT_FRIEND_LIST.add(new FRCLListViewData(obj.get("id").toString(), Status, (obj.get("status")).equals("오프라인") == true ? false : true));
                             ChatViewpager.CHAT_FRIEND_LISTVIEW.invalidateViews();
                             Log.d("FParser", "no : " + (String) obj.get("no"));
                             Log.d("FParser", "id : " + (String) obj.get("id"));
+                            Log.d("FParser", "status : " + (String) obj.get("status"));
                             Log.d("FParser", "channel : " + (String) obj.get("channel"));
                             Log.d("FParser", "game_name : " + (String) obj.get("game_name"));
                             Log.d("FParser", "time : " + (String) obj.get("time"));
@@ -409,7 +419,13 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
                                 return;
                             }
                             JSONObject obj = (JSONObject) parser.parse(json);
-                            ChatViewpager.CHAT_CLAN_LIST.add(obj.get("id").toString());
+                            String Status = "";
+                            if (obj.get("game_name") != null) {
+                                Status = obj.get("status").toString()+" ("+obj.get("game_name").toString()+")";
+                            } else {
+                                Status = obj.get("status").toString();
+                            }
+                            ChatViewpager.CHAT_CLAN_LIST.add(new FRCLListViewData(obj.get("id").toString(), Status, (obj.get("status")).equals("오프라인") == true ? false : true));
                             ChatViewpager.CHAT_CLAN_LISTVIEW.invalidateViews();
                             Log.d("FParser", "no : "+ (String) obj.get("no"));
                             Log.d("FParser", "id : "+ (String) obj.get("id"));
