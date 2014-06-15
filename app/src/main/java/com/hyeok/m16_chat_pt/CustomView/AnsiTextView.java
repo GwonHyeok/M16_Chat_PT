@@ -16,6 +16,11 @@ import java.util.regex.Pattern;
  */
 public class AnsiTextView extends TextView {
     /**
+     * Max Line Num
+     */
+    private final int MAX_LINE_NUM = 200;
+
+    /**
      * ANSI TextColor for Terminal.app
      */
     private final int BLACK = Color.rgb(0,0,0); // [0m, [30m
@@ -41,6 +46,23 @@ public class AnsiTextView extends TextView {
 
     @Override
     public void append(CharSequence charSequence, int start, int end) {
+        int excessLineNumber = getLineCount() - MAX_LINE_NUM;
+        if (excessLineNumber > 0) {
+            int eolIndex = -1;
+            CharSequence str = getText();
+            for(int i=0; i<excessLineNumber; i++) {
+                do {
+                    eolIndex++;
+                } while(eolIndex < str.length() && str.charAt(eolIndex) != '\n');
+            }
+            if (eolIndex < str.length()) {
+                getEditableText().delete(0, eolIndex+1);
+            }
+            else {
+                setText("");
+            }
+        }
+
         int INDEX = 1, length = 0;
         Pattern pattern = Pattern.compile("\\[[0-9]*m");
         String result[] = pattern.split(charSequence);
