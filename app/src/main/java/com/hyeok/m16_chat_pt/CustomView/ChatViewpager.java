@@ -114,51 +114,50 @@ public class ChatViewpager extends Fragment {
         }
         return null;
     }
-}
 
-class FRCLListAdapter extends ArrayAdapter<FRCLListViewData> {
-    private ArrayList<FRCLListViewData> objects;
+    class FRCLListAdapter extends ArrayAdapter<FRCLListViewData> {
+        private ArrayList<FRCLListViewData> objects;
 
-    public FRCLListAdapter(Context context, int textViewResourceId, ArrayList<FRCLListViewData> objects) {
-        super(context, textViewResourceId, objects);
-        this.objects = objects;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        if (v == null) {
-            LayoutInflater layoutInflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = layoutInflater.inflate(R.layout.custom_frcl_listview, null);
+        public FRCLListAdapter(Context context, int textViewResourceId, ArrayList<FRCLListViewData> objects) {
+            super(context, textViewResourceId, objects);
+            this.objects = objects;
         }
-        FRCLListViewData frclListViewData = objects.get(position);
-        if(frclListViewData != null) {
-            String name = frclListViewData.getname();
-            String status = frclListViewData.getstatus();
-            boolean is_online = frclListViewData.getis_online();
-            TextView nameView = (TextView)v.findViewById(R.id.custom_listview_name_text);
-            TextView infoView = (TextView)v.findViewById(R.id.custom_listview_info_text);
-            ImageView onlineView = (ImageView)v.findViewById(R.id.custom_listview_online_image);
-            nameView.setText(name);
-            infoView.setText(status);
-            float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, getContext().getResources().getDisplayMetrics());
-            int x = (int)px;
-            int y = (int)px;
-            int r = (int)px/2;
-            Paint mPaint = new Paint();
-            Bitmap bitmap = Bitmap.createBitmap(x,y,Bitmap.Config.ARGB_8888);
-            if(is_online) {
-                mPaint.setColor(Color.rgb(101,167,48));
-                Canvas canvas = new Canvas(bitmap);
-                canvas.drawCircle(x/2, y/2, r/2, mPaint);
-            } else {
-                mPaint.setColor(Color.GRAY);
-                Canvas canvas = new Canvas(bitmap);
-                canvas.drawCircle(x/2, y/2, r/2, mPaint);
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View v = convertView;
+            if (v == null) {
+                LayoutInflater layoutInflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                v = layoutInflater.inflate(R.layout.custom_frcl_listview, null);
             }
-            onlineView.setImageBitmap(bitmap);
+            FRCLListViewData frclListViewData = objects.get(position);
+            if (frclListViewData != null) {
+                String name = frclListViewData.getname();
+                String status = frclListViewData.getstatus();
+                boolean is_online = frclListViewData.getis_online();
+                TextView nameView = (TextView) v.findViewById(R.id.custom_listview_name_text);
+                TextView infoView = (TextView) v.findViewById(R.id.custom_listview_info_text);
+                ImageView onlineView = (ImageView) v.findViewById(R.id.custom_listview_online_image);
+                nameView.setText(name);
+                infoView.setText(status);
+                float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, getContext().getResources().getDisplayMetrics());
+                int x = (int) px;
+                int y = (int) px;
+                int r = (int) px / 2;
+                Paint mPaint = new Paint();
+                Bitmap bitmap = Bitmap.createBitmap(x, y, Bitmap.Config.ARGB_8888);
+                if (is_online) {
+                    mPaint.setColor(Color.rgb(101, 167, 48));
+                    Canvas canvas = new Canvas(bitmap);
+                    canvas.drawCircle(x / 2, y / 2, r / 2, mPaint);
+                } else {
+                    mPaint.setColor(Color.GRAY);
+                    Canvas canvas = new Canvas(bitmap);
+                    canvas.drawCircle(x / 2, y / 2, r / 2, mPaint);
+                }
+                onlineView.setImageBitmap(bitmap);
+            }
+            return v;
         }
-        return v;
     }
 }
-

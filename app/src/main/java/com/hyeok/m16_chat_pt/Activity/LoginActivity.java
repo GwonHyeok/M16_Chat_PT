@@ -20,7 +20,7 @@ import com.hyeok.m16_chat_pt.app.R;
 /**
  * Created by GwonHyeok on 2014. 6. 12..
  */
-public class chat_login extends ActionBarActivity implements View.OnClickListener {
+public class LoginActivity extends ActionBarActivity implements View.OnClickListener {
     private LinearLayout loginbox_layout;
     private ImageView login_logo_image;
     private Button login_button;
@@ -36,22 +36,22 @@ public class chat_login extends ActionBarActivity implements View.OnClickListene
         handler_animation.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Animation animation = AnimationUtils.loadAnimation(chat_login.this, R.anim.translate);
+                Animation animation = AnimationUtils.loadAnimation(LoginActivity.this, R.anim.translate);
                 assert animation != null;
                 animation.setAnimationListener(new Animation.AnimationListener() {
                     @Override
                     public void onAnimationStart(Animation animation) {
                         // IF Already Login
-                        if(PreferencesControl.getInstance(chat_login.this).getValue(PreferencesControl.USER_DATA_PREF, PreferencesControl.USER_NAME, null) != null) {
+                        if(PreferencesControl.getInstance(LoginActivity.this).getValue(PreferencesControl.USER_DATA_PREF, PreferencesControl.USER_NAME, null) != null) {
                             finish();
-                            startActivity(new Intent(chat_login.this, chat_main.class));
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         }
                     }
 
                     @Override
                     public void onAnimationEnd(Animation animation) {
                         // IF Not Login = Show login Box
-                        Animation animation1 = AnimationUtils.loadAnimation(chat_login.this, R.anim.fade);
+                        Animation animation1 = AnimationUtils.loadAnimation(LoginActivity.this, R.anim.fade);
                         loginbox_layout.setVisibility(View.VISIBLE);
                         loginbox_layout.startAnimation(animation1);
                     }
@@ -71,12 +71,12 @@ public class chat_login extends ActionBarActivity implements View.OnClickListene
             String uname = login_uname_edittext.getText().toString();
             String pwd = login_pwd_edittext.getText().toString();
             if(uname.isEmpty() || pwd.isEmpty()) {
-                Toast.makeText(chat_login.this, "아이디나 비밀번호를 입력하세요.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "아이디나 비밀번호를 입력하세요.", Toast.LENGTH_SHORT).show();
             } else {
-                PreferencesControl.getInstance(chat_login.this).put(PreferencesControl.USER_DATA_PREF, PreferencesControl.USER_NAME, uname);
-                PreferencesControl.getInstance(chat_login.this).put(PreferencesControl.USER_DATA_PREF, PreferencesControl.USER_PWD, pwd);
+                PreferencesControl.getInstance(LoginActivity.this).put(PreferencesControl.USER_DATA_PREF, PreferencesControl.USER_NAME, uname);
+                PreferencesControl.getInstance(LoginActivity.this).put(PreferencesControl.USER_DATA_PREF, PreferencesControl.USER_PWD, pwd);
                 finish();
-                startActivity(new Intent(chat_login.this, chat_main.class));
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
             }
         }
     }

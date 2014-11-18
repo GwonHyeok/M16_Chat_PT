@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="100"
-    tools:context="com.hyeok.m16_chat_pt.Activity.chat_main">
+    tools:context="com.hyeok.m16_chat_pt.Activity.MainActivity">
 
     <RelativeLayout
         android:layout_width="fill_parent"

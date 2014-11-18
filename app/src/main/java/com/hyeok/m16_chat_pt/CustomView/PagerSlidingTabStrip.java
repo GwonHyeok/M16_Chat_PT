@@ -277,6 +277,14 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
         }
     }
 
+    public void setTabText(int index, int TextSize, String msg) {
+        View v = tabsContainer.getChildAt(index);
+        if (v instanceof TextView) {
+            ((TextView) v).setText(msg);
+            ((TextView) v).setTextSize(TypedValue.COMPLEX_UNIT_PX, TextSize);
+        }
+    }
+
     private void updateTabStyles() {
 
         for (int i = 0; i < tabCount; i++) {

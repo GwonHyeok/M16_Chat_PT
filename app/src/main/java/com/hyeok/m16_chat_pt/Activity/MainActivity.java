@@ -50,7 +50,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 
 
-public class chat_main extends ActionBarActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {
+public class MainActivity extends ActionBarActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {
     private String TAG = "M16_CHAT";
     private PagerSlidingTabStrip pagerSlidingTabStrip;
     private ViewPager viewPager;
@@ -151,7 +151,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
     private void NotificationInit() {
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) {
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, chat_main.class), PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
             Notification.Builder mBuilder = new Notification.Builder(this);
             mBuilder.setSmallIcon(R.drawable.ic_launcher);
             mBuilder.setWhen(System.currentTimeMillis());
@@ -167,7 +167,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
             notification.flags = Notification.FLAG_AUTO_CANCEL;
             notification.defaults = Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE ;
             notification.number = 0;
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, chat_main.class), PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
             notification.setLatestEventInfo(this, "M16채팅이 실행중 입니다...", "", pendingIntent);
             nm.notify(0, notification);
         }
@@ -275,7 +275,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
                 Enter();
                 return true;
             } catch (IOException e) {
-                Toast.makeText(chat_main.this, "연결이 끊겼습니다.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "연결이 끊겼습니다.", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
                 return false;
             }
@@ -288,8 +288,8 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
         @Override
         public void run() {
             try {
-                chatoutputStream.write((PreferencesControl.getInstance(chat_main.this).getValue(PreferencesControl.USER_DATA_PREF, PreferencesControl.USER_NAME, null) + "\n").getBytes());
-                chatoutputStream.write((PreferencesControl.getInstance(chat_main.this).getValue(PreferencesControl.USER_DATA_PREF, PreferencesControl.USER_PWD, null) + "\n").getBytes());
+                chatoutputStream.write((PreferencesControl.getInstance(MainActivity.this).getValue(PreferencesControl.USER_DATA_PREF, PreferencesControl.USER_NAME, null) + "\n").getBytes());
+                chatoutputStream.write((PreferencesControl.getInstance(MainActivity.this).getValue(PreferencesControl.USER_DATA_PREF, PreferencesControl.USER_PWD, null) + "\n").getBytes());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -341,10 +341,10 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
                     Log.i(TAG, temp);
                     // Login Fail Check
                     if(temp.equals("Login incorrect.")) {
-                        PreferencesControl.getInstance(chat_main.this).clearAll(PreferencesControl.USER_DATA_PREF);
+                        PreferencesControl.getInstance(MainActivity.this).clearAll(PreferencesControl.USER_DATA_PREF);
                         overridePendingTransition(R.anim.fade, R.anim.fade);
                         finish();
-                        startActivity(new Intent(chat_main.this, chat_login.class));
+                        startActivity(new Intent(MainActivity.this, LoginActivity.class));
                         msg.obj = "로그인에 실패하였습니다.";
                         CHAT_TOAST_HANDLER.sendMessage(msg);
                         InterrupThread();
@@ -421,7 +421,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
         CHAT_TOAST_HANDLER = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                Toast.makeText(chat_main.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
             }
         };
 
@@ -434,6 +434,7 @@ public class chat_main extends ActionBarActivity implements View.OnClickListener
                     if (((String) msg.obj).contains("Joining channel :")) {
                         SHOW_CHAT_START = true;
                         CHANNEL_USER_LIST.clear();
+//                        pagerSlidingTabStrip.setTabText(0, 26, msg.obj.toString().split("Joining channel :\"")[1].split("\"")[0]);
                         CHANNEL_USER_TEXTVIEW.setText("현재체널 : " + msg.obj.toString().split("Joining channel :\"")[1].split("\"")[0]);
                     } else if (((String) msg.obj).contains("{@startfriend}")) {
                         SHOW_CHAT_START = false;
